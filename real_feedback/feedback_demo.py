@@ -2,10 +2,19 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import pandas as pd
 import numpy as np 
 import jieba
+import time
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer, TfidfTransformer
 from sklearn.metrics.pairwise import cosine_similarity, linear_kernel
 from info_extraction import info_extractor
+import matplotlib.pyplot as plt
+
+plt.style.use('fivethirtyeight')
+plt.rcParams['font.sans-serif'] = ['Taipei Sans TC Beta']
+
 jieba.set_dictionary('jieba_traditional.txt')
+
+df_new = pd.read_csv('new_feedback.csv', encoding= 'ANSI')
+df_new = df_new[df_new['情緒標記']!=100]
 
 df_clean = pd.read_csv('df_clean.csv')
 
@@ -24,6 +33,8 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.show_sent_plots.setFont(font)
         self.show_sent_plots.setObjectName("show_sent_plots")
+
+        self.show_sent_plots.clicked.connect(self.show_Sent_plot_press)
 
         self.keyword_input = QtWidgets.QLineEdit(self.centralwidget)
         self.keyword_input.setGeometry(QtCore.QRect(650, 160, 391, 81))
@@ -51,6 +62,8 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.model_test.setFont(font)
         self.model_test.setObjectName("model_test")
+
+        self.model_test.clicked.connect(self.sent_test_press)
 
         self.txt_keyword_query = QtWidgets.QPushButton(self.centralwidget)
         self.txt_keyword_query.setGeometry(QtCore.QRect(650, 640, 311, 81))
@@ -197,6 +210,29 @@ class Ui_MainWindow(object):
             # print(self.comboBox.currentText())
         
         info_extractor(df_clean).keyword_extraction(idx= idx, pos=pos)
+
+    def show_Sent_plot_press(self):
+
+        Series_counts = df_new['情緒標記'].value_counts()
+
+        labels = ['正面評價','負面評價','中性評價']
+        counts = [count for (label, count) in Series_counts.items()]
+        # explode= [0, 0, 1]
+
+        # plot chart 
+        plt.pie(counts, labels= labels, wedgeprops={'edgecolor':'black'}, 
+            autopct='%1.1f%%')
+
+        plt.title('學生回饋 - 情緒比例')
+        plt.tight_layout()
+        plt.show()
+
+    def sent_test_press(self):
+
+        print('模型分析中...')
+        time.sleep(3)
+        print('分析完成！')
+
 
 if __name__ == "__main__":
     import sys
