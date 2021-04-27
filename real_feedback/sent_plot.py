@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib 
 
+print(plt.__file__)
 # print(matplotlib.__file__)
 
 plt.style.use('fivethirtyeight')
